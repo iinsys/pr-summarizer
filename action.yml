@@ -5,6 +5,11 @@ branding:
   icon: 'message-square'
   color: 'purple'
 
+inputs:
+  github_token:
+    description: 'GitHub token for API access'
+    required: true
+
 runs:
   using: 'composite'
   steps:
@@ -18,19 +23,15 @@ runs:
       with:
         toolchain: stable
         profile: minimal
+        override: true
         
-    - name: Build and run PR Summarizer
+    - name: Build and Run PR Summarizer
       shell: bash
       run: |
         cd ${{ github.action_path }}
-        cargo run --release
+        cargo build --release
+        ./target/release/pr-summarizer
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         GITHUB_REPOSITORY: ${{ github.repository }}
         GITHUB_EVENT_PATH: ${{ github.event_path }}
-
-inputs:
-  github_token:
-    description: 'GitHub token for API access'
-    required: true
-    default: ${{ github.token }}

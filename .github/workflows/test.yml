@@ -1,17 +1,16 @@
-name: PR Summarizer
+name: PR Summary
 
-on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+on: [pull_request]
+
+permissions:
+  pull-requests: write  # Required to comment on PRs
+  issues: write        # Required since PR comments use the issues API
 
 jobs:
   summarize:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Run PR Summarizer
-        uses: ./  # Uses the local action in your repository
+      - name: Run PR Summarizer Action
+        uses: ./ 
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

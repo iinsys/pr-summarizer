@@ -1,0 +1,17 @@
+name: PR Summarizer
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  summarize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run PR Summarizer
+        uses: ./  # Uses the local action in your repository
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}

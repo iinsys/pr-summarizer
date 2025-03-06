@@ -4,12 +4,18 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+permissions:
+  pull-requests: write  # Required to comment on PRs
+  issues: write        # Required for PR comments via issues API
+
 jobs:
   summarize:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Ensures full history for diff analysis
 
       - name: Run PR Summarizer
         uses: ./  # Uses the local action in your repository

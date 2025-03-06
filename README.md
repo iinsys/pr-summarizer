@@ -1,5 +1,10 @@
 # PR Summarizer with Jokes
 
+![GitHub Test Actions Status](https://github.com/bansikah22/fibbot/actions/workflows/test.yml/badge.svg)
+![GitHub Test Actions Status](https://github.com/bansikah22/fibbot/actions/workflows/release.yml/badge.svg)
+![GitHub Issues](https://img.shields.io/github/issues/bansikah22/fibbot?color=red)
+![Open Source](https://img.shields.io/github/license/bansikah22/fibbot?color=green)
+
 A GitHub Action that automatically summarizes pull requests and adds a random programming joke to make code reviews more enjoyable.
 
 ## Features
@@ -38,11 +43,21 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+permissions:
+  pull-requests: write  # Required to comment on PRs
+  issues: write        # Required for PR comments via issues API
+
 jobs:
   summarize:
     runs-on: ubuntu-latest
     steps:
-      - uses: yourusername/pr-summarizer@v1
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Ensures full history for diff analysis
+
+      - name: Run PR Summarizer
+        uses: bansikah22/pr-summarizer@master  # Uses the local action in your repository
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 ```

@@ -82,7 +82,7 @@ jobs:
 
 ### Prerequisites
 
-- Rust 1.56+
+- Rust 1.83.+
 - Cargo
 
 ### Building
@@ -96,7 +96,16 @@ cargo build --release
 ```bash
 cargo test
 ```
+## 🤝 Contributors
 
-## License
+We appreciate the efforts of all contributors who help improve this project. 
+
+| Contributor        | Role                         |
+|-------------------|-----------------------------|
+| **Noel Bansikah** | Author & Maintainer         |
+
+Contributions are welcomed! 🎉 Feel free to submit issues, feature requests, or pull requests to help enhance this project.
+
+## 📜 License
 
 [MIT](./LICENSE) License

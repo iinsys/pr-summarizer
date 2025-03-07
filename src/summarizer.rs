@@ -13,7 +13,7 @@ pub fn generate_summary(pr_info: &PrInfo) -> Result<Summary> {
     
     // If the PR has a title that's meaningful, add it
     if !pr_info.title.is_empty() {
-        description_points.push(format!("- {}", pr_info.title));
+        description_points.push(format!("✨ {}", pr_info.title));
     }
     
     // Try to extract key points from the PR description
@@ -62,7 +62,7 @@ fn extract_key_points(description: &str) -> Vec<String> {
                 .trim();
 
             if !content.is_empty() {
-                points.push(format!("- {}", content));
+                points.push(format!("✅ {}", content));
             }
         }
     }
@@ -86,7 +86,7 @@ fn infer_changes_from_files(files: &[crate::github::ChangedFile]) -> Vec<String>
     // Check for specific patterns
     let has_tests = files.iter().any(|f| f.filename.contains("test") || f.filename.contains("spec"));
     if has_tests {
-        points.push("- Added or updated tests".to_string());
+        points.push("🧪 Added or updated tests".to_string());
     }
     
     let has_docs = files.iter().any(|f| 
@@ -96,7 +96,7 @@ fn infer_changes_from_files(files: &[crate::github::ChangedFile]) -> Vec<String>
         f.filename.eq("README.md")
     );
     if has_docs {
-        points.push("- Updated documentation".to_string());
+        points.push("📚 Updated documentation".to_string());
     }
     
     // Look at file extensions to identify the primary changes
@@ -118,17 +118,17 @@ fn infer_changes_from_files(files: &[crate::github::ChangedFile]) -> Vec<String>
         let removed = dir_files.iter().filter(|f| matches!(f.status, FileStatus::Removed)).count();
         
         if added > 0 && added == dir_files.len() {
-            points.push(format!("- Added new {} component/module", dir));
+            points.push(format!("🆕 Added new {} component/module", dir));
         } else if removed > 0 && removed == dir_files.len() {
-            points.push(format!("- Removed {} component/module", dir));
+            points.push(format!("🗑️ Removed {} component/module", dir));
         } else if modified > 0 {
-            points.push(format!("- Updated {} component/module", dir));
+            points.push(format!("🔄 Updated {} component/module", dir));
         }
     }
     
     // Ensure we have at least one point
     if points.is_empty() && !files.is_empty() {
-        points.push(format!("- Modified {} files", files.len()));
+        points.push(format!("📝 Modified {} files", files.len()));
     }
     
     points
@@ -138,14 +138,14 @@ fn format_affected_files(files: &[crate::github::ChangedFile]) -> String {
     let mut result = String::new();
     
     for file in files {
-        let status = match file.status {
-            FileStatus::Added => "[+]",
-            FileStatus::Modified => "[M]",
-            FileStatus::Removed => "[-]",
-            FileStatus::Renamed => "[R]",
+        let (status_icon, status_text) = match file.status {
+            FileStatus::Added => ("🟢", "[+]"),
+            FileStatus::Modified => ("🔵", "[M]"),
+            FileStatus::Removed => ("🔴", "[-]"),
+            FileStatus::Renamed => ("🟡", "[R]"),
         };
         
-        result.push_str(&format!("- {} {}\n", status, file.filename));
+        result.push_str(&format!("- {} {} {}\n", status_icon, status_text, file.filename));
     }
     
     result

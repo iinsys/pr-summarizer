@@ -14,19 +14,38 @@ const JOKE_APIS: &[&str] = &[
     "https://icanhazdadjoke.com/",
 ];
 
+// Collection of emojis to randomly append to jokes
+const JOKE_EMOJIS: &[&str] = &[
+    "😂", "🤣", "😆", "😅", "😄", "😁", "🙂", "😉", "🤪", "🤓", 
+    "👨‍💻", "👩‍💻", "💻", "⌨️", "🖥️", "🐛", "🔧", "🛠️"
+];
+
 pub async fn fetch_random_joke() -> Result<String> {
     let client = Client::new();
     
     // Try different joke APIs in sequence until one works
     for (index, &api_url) in JOKE_APIS.iter().enumerate() {
         match fetch_from_api(&client, api_url, index).await {
-            Ok(joke) => return Ok(joke),
+            Ok(joke) => return Ok(add_emoji_to_joke(&joke)),
             Err(e) => log::warn!("Failed to fetch joke from {}: {}", api_url, e),
         }
     }
     
     // If all APIs fail, return a fallback joke
-    Ok(get_fallback_joke())
+    Ok(add_emoji_to_joke(&get_fallback_joke()))
+}
+
+fn add_emoji_to_joke(joke: &str) -> String {
+    // Select a random emoji from the collection
+    let emoji_index = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs() as usize % JOKE_EMOJIS.len();
+    
+    let emoji = JOKE_EMOJIS[emoji_index];
+    
+    // Add emoji to the end of the joke
+    format!("{} {}", joke, emoji)
 }
 
 async fn fetch_from_api(client: &Client, url: &str, api_index: usize) -> Result<String> {
@@ -87,6 +106,11 @@ fn get_fallback_joke() -> String {
         "How many programmers does it take to change a light bulb? None, that's a hardware problem.",
         "A SQL query walks into a bar, sees two tables and asks, 'Can I join you?'",
         "Debugging: Being the detective in a crime movie where you are also the murderer.",
+        "The best thing about a Boolean is that even if you're wrong, you're only off by a bit.",
+        "Programming is like writing a book... except if you miss a single comma on page 126, the whole thing makes no sense.",
+        "Why do Java developers wear glasses? Because they don't C#!",
+        "Why was the JavaScript developer sad? Because he didn't Node how to Express himself.",
+        "I'd tell you a UDP joke, but you might not get it."
     ];
     
     // Use a simple random selection (not cryptographically secure but good enough for jokes)

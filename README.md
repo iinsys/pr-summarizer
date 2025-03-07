@@ -1,9 +1,9 @@
 # PR Summarizer with Jokes
 
-![GitHub Test Actions Status](https://github.com/bansikah22/fibbot/actions/workflows/test.yml/badge.svg)
-![GitHub Test Actions Status](https://github.com/bansikah22/fibbot/actions/workflows/release.yml/badge.svg)
-![GitHub Issues](https://img.shields.io/github/issues/bansikah22/fibbot?color=red)
-![Open Source](https://img.shields.io/github/license/bansikah22/fibbot?color=green)
+![GitHub Test Actions Status](https://github.com/bansikah22/pr-summarizer/actions/workflows/test.yml/badge.svg)
+![GitHub Test Actions Status](https://github.com/bansikah22/pr-summarizer/actions/workflows/release.yml/badge.svg)
+![GitHub Issues](https://img.shields.io/github/issues/bansikah22/pr-summarizer?color=red)
+![Open Source](https://img.shields.io/github/license/bansikah22/pr-summarizer?color=green)
 
 A GitHub Action that automatically summarizes pull requests and adds a random programming joke to make code reviews more enjoyable.
 

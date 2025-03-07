@@ -4,31 +4,36 @@ author: 'Noel Bansikah'
 branding:
   icon: 'message-square'
   color: 'purple'
-
 inputs:
   github_token:
     description: 'GitHub token for API access'
     required: true
-  version:
-    description: 'Version of the action to use (e.g., v1.0.3)'
-    required: true
-    default: 'latest'
-
 runs:
   using: 'composite'
   steps:
     - name: Download Precompiled Binary
       shell: bash
       run: |
+        # Extract version from the action tag reference
+        VERSION=${GITHUB_ACTION_REF#v}
+        if [ "$VERSION" == "$GITHUB_ACTION_REF" ]; then
+          # No 'v' prefix, use as is
+          VERSION=$GITHUB_ACTION_REF
+        fi
+        
+        echo "Downloading version: $VERSION"
+        
         curl -L -o pr-summarizer.tar.gz \
-          "https://github.com/bansikah22/pr-summarizer/releases/download/${{ inputs.version }}/pr-summarizer-${{ inputs.version }}.tar.gz"
+          "https://github.com/bansikah22/pr-summarizer/releases/download/v${VERSION}/pr-summarizer-v${VERSION}.tar.gz"
+        
+        # Debug info
         ls -lh pr-summarizer.tar.gz
         file pr-summarizer.tar.gz
+        
         tar -xzf pr-summarizer.tar.gz
         chmod +x pr-summarizer
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-
     - name: Run PR Summarizer
       shell: bash
       run: ./pr-summarizer

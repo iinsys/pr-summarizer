@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 permissions:
   contents: write
@@ -41,10 +41,10 @@ jobs:
           tar -czf pr-summarizer-${{ github.ref_name }}.tar.gz -C target/release pr-summarizer
         if: success()
 
-      - name: Debug Release Info
+      - name: Debug Binary Path
         run: |
-          echo "Tag: ${{ github.ref_name }}"
-          echo "Binary: pr-summarizer-${{ github.ref_name }}.tar.gz"
+          ls -la target/release/
+          file target/release/pr-summarizer
         if: success()
 
       - name: Create and Upload Release

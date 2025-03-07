@@ -16,8 +16,13 @@ runs:
     - name: Download Precompiled Binary
       shell: bash
       run: |
+        # Use the specific version for now (v1.0.2)
         curl -L -o pr-summarizer.tar.gz \
-          "https://github.com/bansikah22/pr-summarizer/releases/download/${{ github.action_ref }}/pr-summarizer-${{ github.action_ref }}.tar.gz"
+          "https://github.com/bansikah22/pr-summarizer/releases/download/v1.0.2/pr-summarizer-v1.0.2.tar.gz"
+        # Debug: Show file size and type
+        ls -lh pr-summarizer.tar.gz
+        file pr-summarizer.tar.gz
+        # Extract
         tar -xzf pr-summarizer.tar.gz
         chmod +x pr-summarizer
       env:

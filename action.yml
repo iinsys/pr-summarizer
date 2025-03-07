@@ -13,16 +13,24 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Determine Version
+      id: get_version
+      shell: bash
+      run: |
+        # Extract version from the 'uses' directive context
+        VERSION=$(echo "${{ github.action_ref }}" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' || echo "latest")
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+
     - name: Download Precompiled Binary
       shell: bash
       run: |
-        # Use the specific version for now (v1.0.2)
+        VERSION="${{ steps.get_version.outputs.version }}"
         curl -L -o pr-summarizer.tar.gz \
-          "https://github.com/bansikah22/pr-summarizer/releases/download/v1.0.2/pr-summarizer-v1.0.2.tar.gz"
-        # Debug: Show file size and type
+          "https://github.com/bansikah22/pr-summarizer/releases/download/$VERSION/pr-summarizer-$VERSION.tar.gz"
         ls -lh pr-summarizer.tar.gz
         file pr-summarizer.tar.gz
-        # Extract
         tar -xzf pr-summarizer.tar.gz
         chmod +x pr-summarizer
       env:

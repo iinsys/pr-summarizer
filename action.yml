@@ -1,6 +1,6 @@
 name: 'PR Summarizer with Jokes'
 description: 'Automatically summarizes pull requests and adds a joke for fun'
-author: 'bansikah22'
+author: 'Noel Bansikah'
 branding:
   icon: 'message-square'
   color: 'purple'

@@ -13,18 +13,19 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Setup Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        profile: minimal
-        override: true
-        
-    - name: Build and Run PR Summarizer
+    - name: Download Precompiled Binary
       shell: bash
       run: |
-        cargo build --release
-        ./target/release/pr-summarizer
+        curl -L -o pr-summarizer.tar.gz \
+          "https://github.com/bansikah22/pr-summarizer/releases/download/${{ github.action_ref }}/pr-summarizer-${{ github.action_ref }}.tar.gz"
+        tar -xzf pr-summarizer.tar.gz
+        chmod +x pr-summarizer
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+
+    - name: Run PR Summarizer
+      shell: bash
+      run: ./pr-summarizer
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         GITHUB_REPOSITORY: ${{ github.repository }}

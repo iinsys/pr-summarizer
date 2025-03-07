@@ -2,7 +2,7 @@
 name = "pr-summarizer"
 version = "0.1.0"
 edition = "2021"
-authors = ["Your Name <your.email@example.com>"]
+authors = ["Noel Bansikah tandapnoelbansikah@gmail.com"]
 description = "A GitHub Action that summarizes PRs and adds jokes"
 
 [dependencies]

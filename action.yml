@@ -14,28 +14,39 @@ runs:
     - name: Download Precompiled Binary
       shell: bash
       run: |
-        # Extract version from GitHub reference
-        VERSION=${GITHUB_REF_NAME#v}
+        # Get the action version from the reference
+        ACTION_VERSION="${{ github.action_ref }}"
+        
+        # Remove 'v' prefix if present
+        VERSION="${ACTION_VERSION#v}"
+        
+        # As fallback, you can hardcode the latest version
         if [[ -z "$VERSION" ]]; then
-          # If not running from a tag, use the action ref
-          ACTION_REF=${{ github.action_ref }}
-          VERSION=${ACTION_REF#v}
-          if [[ "$VERSION" == "$ACTION_REF" ]]; then
-            # No 'v' prefix, use as is
-            VERSION=$ACTION_REF
-          fi
+          VERSION="1.0.5"
+          echo "No version detected, using default: $VERSION"
+        else 
+          echo "Using version: $VERSION"
         fi
         
-        echo "Using version: $VERSION"
+        echo "Downloading from: https://github.com/bansikah22/pr-summarizer/releases/download/v${VERSION}/pr-summarizer-v${VERSION}.tar.gz"
         
-        curl -L -o pr-summarizer.tar.gz \
-          "https://github.com/bansikah22/pr-summarizer/releases/download/v${VERSION}/pr-summarizer-v${VERSION}.tar.gz"
+        # Download with better error handling
+        if ! curl -L -f -o pr-summarizer.tar.gz \
+          "https://github.com/bansikah22/pr-summarizer/releases/download/v${VERSION}/pr-summarizer-v${VERSION}.tar.gz"; then
+          echo "Download failed! Check if release exists at: https://github.com/bansikah22/pr-summarizer/releases/tag/v${VERSION}"
+          exit 1
+        fi
         
         # Debug info
-        ls -lh pr-summarizer.tar.gz
+        ls -la pr-summarizer.tar.gz
         file pr-summarizer.tar.gz
         
-        tar -xzf pr-summarizer.tar.gz
+        # Extract with error handling
+        if ! tar -xzf pr-summarizer.tar.gz; then
+          echo "Failed to extract archive. It may be corrupted or not a valid gzip file."
+          exit 1
+        fi
+        
         chmod +x pr-summarizer
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}

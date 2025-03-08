@@ -65,10 +65,12 @@ jobs:
           fetch-depth: 0  # Ensures full history for diff analysis
 
       - name: Run PR Summarizer
-        uses: bansikah22/pr-summarizer@v1.0.1  # Uses the lastest actions tag
+        uses: bansikah22/pr-summarizer@v1.0.0  # Uses the lastest actions tag
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+You can also visit test repositories [Test PR Summarizer](https://github.com/bansikah22/test-pr-summarizer) so see how it works on external repositories.
 
 ## How It Works
 

@@ -14,14 +14,19 @@ runs:
     - name: Download Precompiled Binary
       shell: bash
       run: |
-        # Extract version from the action tag reference
-        VERSION=${GITHUB_ACTION_REF#v}
-        if [ "$VERSION" == "$GITHUB_ACTION_REF" ]; then
-          # No 'v' prefix, use as is
-          VERSION=$GITHUB_ACTION_REF
+        # Extract version from GitHub reference
+        VERSION=${GITHUB_REF_NAME#v}
+        if [[ -z "$VERSION" ]]; then
+          # If not running from a tag, use the action ref
+          ACTION_REF=${{ github.action_ref }}
+          VERSION=${ACTION_REF#v}
+          if [[ "$VERSION" == "$ACTION_REF" ]]; then
+            # No 'v' prefix, use as is
+            VERSION=$ACTION_REF
+          fi
         fi
         
-        echo "Downloading version: $VERSION"
+        echo "Using version: $VERSION"
         
         curl -L -o pr-summarizer.tar.gz \
           "https://github.com/bansikah22/pr-summarizer/releases/download/v${VERSION}/pr-summarizer-v${VERSION}.tar.gz"

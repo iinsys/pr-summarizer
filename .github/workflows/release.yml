@@ -38,13 +38,18 @@ jobs:
 
       - name: Package Binary
         run: |
-          tar -czf pr-summarizer-${{ github.ref_name }}.tar.gz -C target/release pr-summarizer
-        if: success()
-
-      - name: Debug Binary Path
-        run: |
-          ls -la target/release/
-          file target/release/pr-summarizer
+          # Create a temporary directory for packaging
+          mkdir -p package
+          cp target/release/pr-summarizer package/
+          
+          # Package the binary properly
+          cd package
+          tar -czf ../pr-summarizer-${{ github.ref_name }}.tar.gz pr-summarizer
+          cd ..
+          
+          # Verify the archive
+          echo "Verifying archive contents:"
+          tar -tvf pr-summarizer-${{ github.ref_name }}.tar.gz
         if: success()
 
       - name: Create and Upload Release

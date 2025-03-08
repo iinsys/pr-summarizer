@@ -22,7 +22,7 @@ runs:
         
         # As fallback, you can hardcode the latest version
         if [[ -z "$VERSION" ]]; then
-          VERSION="1.0.5"
+          VERSION="1.0.0"
           echo "No version detected, using default: $VERSION"
         else 
           echo "Using version: $VERSION"

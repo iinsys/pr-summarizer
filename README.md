@@ -93,11 +93,6 @@ You can also visit test repositories [Test PR Summarizer](https://github.com/ban
 cargo build --release
 ```
 
-### Testing
-
-```bash
-cargo test
-```
 ## 🤝 Contributors
 
 We appreciate the efforts of all contributors who help improve this project. 

@@ -105,6 +105,7 @@ We appreciate the efforts of all contributors who help improve this project.
 | Contributor        | Role                         |
 |-------------------|-----------------------------|
 | **Noel Bansikah** | Author & Maintainer         |
+| **Synk** |  Maintainer         |
 
 Contributions are welcomed! 🎉 Feel free to submit issues, feature requests, or pull requests to help enhance this project.
 

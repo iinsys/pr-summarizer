@@ -16,13 +16,29 @@ const JOKE_APIS: &[&str] = &[
 
 // Collection of emojis to randomly append to jokes
 const JOKE_EMOJIS: &[&str] = &[
-    "😂", "🤣", "😆", "😅", "😄", "😁", "🙂", "😉", "🤪", "🤓", 
-    "👨‍💻", "👩‍💻", "💻", "⌨️", "🖥️", "🐛", "🔧", "🛠️"
+    "😂",
+    "🤣",
+    "😆",
+    "😅",
+    "😄",
+    "😁",
+    "🙂",
+    "😉",
+    "🤪",
+    "🤓",
+    "👨‍💻",
+    "👩‍💻",
+    "💻",
+    "⌨️",
+    "🖥️",
+    "🐛",
+    "🔧",
+    "🛠️",
 ];
 
 pub async fn fetch_random_joke() -> Result<String> {
     let client = Client::new();
-    
+
     // Try different joke APIs in sequence until one works
     for (index, &api_url) in JOKE_APIS.iter().enumerate() {
         match fetch_from_api(&client, api_url, index).await {
@@ -30,20 +46,18 @@ pub async fn fetch_random_joke() -> Result<String> {
             Err(e) => log::warn!("Failed to fetch joke from {}: {}", api_url, e),
         }
     }
-    
+
     // If all APIs fail, return a fallback joke
     Ok(add_emoji_to_joke(&get_fallback_joke()))
 }
 
 fn add_emoji_to_joke(joke: &str) -> String {
     // Select a random emoji from the collection
-    let emoji_index = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_secs() as usize % JOKE_EMOJIS.len();
-    
+    let range = 0..JOKE_EMOJIS.len();
+    let emoji_index = random_number::random_ranged(range);
+
     let emoji = JOKE_EMOJIS[emoji_index];
-    
+
     // Add emoji to the end of the joke
     format!("{} {}", joke, emoji)
 }
@@ -53,15 +67,21 @@ async fn fetch_from_api(client: &Client, url: &str, api_index: usize) -> Result<
         .get(url)
         .timeout(Duration::from_secs(5))
         .header("Accept", "application/json");
-    
+
     let response = request.send().await.context("Failed to send request")?;
-    
+
     if !response.status().is_success() {
-        return Err(anyhow::anyhow!("API returned error status: {}", response.status()));
+        return Err(anyhow::anyhow!(
+            "API returned error status: {}",
+            response.status()
+        ));
     }
-    
-    let text = response.text().await.context("Failed to read response body")?;
-    
+
+    let text = response
+        .text()
+        .await
+        .context("Failed to read response body")?;
+
     // Parse response based on the API format
     match api_index {
         0 => {
@@ -70,16 +90,16 @@ async fn fetch_from_api(client: &Client, url: &str, api_index: usize) -> Result<
             if jokes.is_empty() {
                 return Err(anyhow::anyhow!("Empty joke response"));
             }
-            
+
             let setup = jokes[0]["setup"].as_str().unwrap_or_default();
             let punchline = jokes[0]["punchline"].as_str().unwrap_or_default();
-            
+
             if !setup.is_empty() && !punchline.is_empty() {
                 Ok(format!("{} {}", setup, punchline))
             } else {
                 Err(anyhow::anyhow!("Invalid joke format"))
             }
-        },
+        }
         1 => {
             // jokeapi.dev returns a single joke object
             let joke: serde_json::Value = serde_json::from_str(&text)?;
@@ -88,12 +108,12 @@ async fn fetch_from_api(client: &Client, url: &str, api_index: usize) -> Result<
             } else {
                 Err(anyhow::anyhow!("Invalid joke format"))
             }
-        },
+        }
         2 => {
             // icanhazdadjoke returns a single joke
             let joke: JokeResponse = serde_json::from_str(&text)?;
             Ok(joke.joke)
-        },
+        }
         _ => Err(anyhow::anyhow!("Unknown API index")),
     }
 }
@@ -112,12 +132,10 @@ fn get_fallback_joke() -> String {
         "Why was the JavaScript developer sad? Because he didn't Node how to Express himself.",
         "I'd tell you a UDP joke, but you might not get it."
     ];
-    
+
     // Use a simple random selection (not cryptographically secure but good enough for jokes)
-    let joke_index = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_secs() as usize % jokes.len();
-    
+    let range = 0..jokes.len();
+    let joke_index = random_number::random_ranged(range);
+
     jokes[joke_index].to_string()
 }

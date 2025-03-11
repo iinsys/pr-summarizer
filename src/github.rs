@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use anyhow::{Context, Result};
 use octocrab::Octocrab;
 
@@ -19,11 +21,25 @@ pub struct ChangedFile {
     pub deletions: i32,
 }
 
+#[derive(Debug)]
 pub enum FileStatus {
     Added,
     Modified,
     Removed,
     Renamed,
+}
+
+impl FromStr for FileStatus {
+    type Err = ();
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        match s {
+            "added" => Ok(FileStatus::Added),
+            "modified" => Ok(FileStatus::Modified),
+            "removed" => Ok(FileStatus::Removed),
+            "renamed" => Ok(FileStatus::Renamed),
+            _ => Ok(FileStatus::Modified),
+        }
+    }
 }
 
 pub fn create_github_client(token: &str) -> Result<Octocrab> {
@@ -36,8 +52,8 @@ pub fn create_github_client(token: &str) -> Result<Octocrab> {
 pub async fn get_pr_info(
     client: &Octocrab,
     owner: &str,
-    repo: &str, 
-    pr_number: u64
+    repo: &str,
+    pr_number: u64,
 ) -> Result<PrInfo> {
     // Get PR details
     let pr = client
@@ -45,38 +61,43 @@ pub async fn get_pr_info(
         .get(pr_number)
         .await
         .context("Failed to get PR details")?;
-    
+
     // Get PR changed files
     let files = client
         .pulls(owner, repo)
         .list_files(pr_number)
         .await
         .context("Failed to get PR files")?;
-    
+
     // Convert to our internal model
     let changed_files = files
         .into_iter()
         .map(|file| {
-            let status = match format!("{:?}", file.status).as_str() {
-                "added" => FileStatus::Added,
-                "removed" => FileStatus::Removed,
-                "renamed" => FileStatus::Renamed,
-                _ => FileStatus::Modified,
-            };
-            
+            let status = format!("{:?}", file.status);
+            let status = FileStatus::from_str(&status).unwrap();
+            let additions = file.additions as i32;
+            let filename = file.filename;
+            let deletions = file.deletions as i32;
             ChangedFile {
-                filename: file.filename,
+                filename,
                 status,
-                additions: file.additions as i32,
-                deletions: file.deletions as i32,
+                additions,
+                deletions,
             }
         })
         .collect();
-    
+
     Ok(PrInfo {
         title: pr.title.unwrap_or_default(),
         description: pr.body.unwrap_or_default(),
-        base_branch: pr.base.repo.as_ref().map_or_else(|| String::default(), |repo| repo.owner.as_ref().map_or_else(|| String::default(), |owner| owner.login.clone())),
+        base_branch: pr.base.repo.as_ref().map_or_else(
+            || String::default(),
+            |repo| {
+                repo.owner
+                    .as_ref()
+                    .map_or_else(|| String::default(), |owner| owner.login.clone())
+            },
+        ),
         head_branch: pr.head.ref_field,
         author: pr.user.unwrap().login,
         changed_files,
@@ -95,6 +116,5 @@ pub async fn post_pr_comment(
         .create_comment(pr_number, comment)
         .await
         .context("Failed to post comment")?;
-    
     Ok(())
 }

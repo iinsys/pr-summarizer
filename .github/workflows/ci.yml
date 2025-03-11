@@ -39,11 +39,6 @@ jobs:
     - name: Install Nextest test runner
       uses: taiki-e/install-action@nextest
 
-    - name: Create example env file
-      run: |
-        chmod +x .github/scripts/test_config.sh
-        sh .github/scripts/test_config.sh
-
     - name: Check Formatting
       run: cargo fmt --all -- --check
 

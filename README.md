@@ -101,6 +101,7 @@ We appreciate the efforts of all contributors who help improve this project.
 |-------------------|-----------------------------|
 | **Noel Bansikah** | Author & Maintainer         |
 | **Synk** |  Maintainer         |
+| **Christian Yamele** |  Rust Developer        |
 
 Contributions are welcomed! 🎉 Feel free to submit issues, feature requests, or pull requests to help enhance this project.
 

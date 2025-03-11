@@ -87,17 +87,21 @@ pub async fn get_pr_info(
         })
         .collect();
 
+    fn default<T: Default>() -> impl FnOnce() -> T {
+        || T::default()
+    }
     Ok(PrInfo {
         title: pr.title.unwrap_or_default(),
         description: pr.body.unwrap_or_default(),
-        base_branch: pr.base.repo.as_ref().map_or_else(
-            || String::default(),
-            |repo| {
+        base_branch: pr
+            .base
+            .repo
+            .as_ref()
+            .map_or_else(default::<String>(), |repo| {
                 repo.owner
                     .as_ref()
-                    .map_or_else(|| String::default(), |owner| owner.login.clone())
-            },
-        ),
+                    .map_or_else(default::<String>(), |owner| owner.login.clone())
+            }),
         head_branch: pr.head.ref_field,
         author: pr.user.unwrap().login,
         changed_files,

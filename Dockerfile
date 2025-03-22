@@ -3,6 +3,6 @@ WORKDIR /usr/src/app
 COPY . .
 RUN cargo build --release
 
-FROM debian:12.9-slim
+FROM debian:12.10-slim
 COPY --from=builder /usr/src/app/target/release/pr-summarizer /usr/local/bin/pr-summarizer
 ENTRYPOINT ["pr-summarizer"]

@@ -92,6 +92,7 @@ You can also visit test repositories [Test PR Summarizer](https://github.com/ban
 ```bash
 cargo build --release
 ```
+You can alos make use of the [ci-local.sh](./ci-local.sh) file to simulate ci locally
 
 ## 🤝 Contributors
 

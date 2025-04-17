@@ -37,7 +37,7 @@ impl FromStr for FileStatus {
             "modified" => Ok(FileStatus::Modified),
             "removed" => Ok(FileStatus::Removed),
             "renamed" => Ok(FileStatus::Renamed),
-            _ => Ok(FileStatus::Modified),
+            _ => Err(()), // Explicitly return an error for unrecognized statuses
         }
     }
 }
@@ -72,17 +72,20 @@ pub async fn get_pr_info(
     // Convert to our internal model
     let changed_files = files
         .into_iter()
-        .map(|file| {
-            let status = format!("{:?}", file.status);
-            let status = FileStatus::from_str(&status).unwrap();
-            let additions = file.additions as i32;
-            let filename = file.filename;
-            let deletions = file.deletions as i32;
-            ChangedFile {
-                filename,
-                status,
-                additions,
-                deletions,
+        .filter_map(|file| {
+            // Convert `DiffEntryStatus` to `&str` for parsing
+            let status_str = format!("{:?}", file.status).to_lowercase(); // Convert to lowercase if needed
+            if let Ok(status) = FileStatus::from_str(&status_str) {
+                Some(ChangedFile {
+                    filename: file.filename,
+                    status,
+                    additions: file.additions as i32,
+                    deletions: file.deletions as i32,
+                })
+            } else {
+                // Use debug formatting for `file.status`
+                log::warn!("Unrecognized file status: {:?}", file.status);
+                None
             }
         })
         .collect();

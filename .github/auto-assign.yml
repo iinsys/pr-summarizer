@@ -1,0 +1,8 @@
+addReviewers: true
+addAssignees: true
+reviewers:
+  - bansikah22
+  - Christiantyemele
+assignees:
+  - bansikah22
+numberOfReviewers: 1
